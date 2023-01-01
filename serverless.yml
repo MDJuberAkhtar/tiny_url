@@ -1,0 +1,64 @@
+service: tiny-url
+
+custom:
+  BUILD_STAGE: ${opt:stage, self:provider.stage}
+  DYNAMOTABLE:
+    dev: 'TinyurlsTable'
+    prod: ''
+  ENV:
+    dev: 'STAGING'
+    prod: 'PRODUCTION'
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  profile: serverlessTinyurl
+  stage: dev
+  region: us-east-1
+  environment:
+        NODE_PATH: "./:/opt/node_modules"
+        ENV: ${self:custom.ENV.${self:custom.BUILD_STAGE}}
+        DYNAMOTABLE: ${self:custom.DYNAMOTABLE.${self:custom.BUILD_STAGE}}
+  iamRoleStatements:
+        - Effect: Allow
+          Action:
+              - dynamodb:*
+          Resource: '*'
+plugins:
+  - serverless-offline
+
+
+
+functions:
+  tinyurl:
+    name: create-${self:service}-${opt:stage, self:provider.stage}
+    description: create tiny url
+    handler: handler.handler
+    # url:
+    #   cors: true
+
+resources:
+  Resources:
+    TinyurlsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.DYNAMOTABLE.${self:custom.BUILD_STAGE}}
+        AttributeDefinitions:
+          - AttributeName: tinyurl
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tinyurl
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+
+
+package:
+  exclude:
+    - node_modules/**
+    - .gitignore
+    - serverless.yml
+    - package-lock.json
+
