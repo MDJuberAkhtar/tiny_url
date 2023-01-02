@@ -7,6 +7,7 @@ const errorWithCode = (err) => {
     error['1003'] = {code: '1003', status:400, message:'URL_ERROR', description:'Sorry! requested url do not exits!'};
     error['1004'] = {code: '1004', status:400, message:'URL_VALIDATION_ERROR', description:'Please provide a valid url'};
     error['1005'] = {code: '1005', status:400, message:'DB_INSERTION_ERROR', description:'fail to create data'};
+    error['1006'] = {code: '1006', status:400, message:'AUTHENTICATION_ERROR', description:'email already exists!'};
     
     if (err && error[err]) {
         let final_error = {};

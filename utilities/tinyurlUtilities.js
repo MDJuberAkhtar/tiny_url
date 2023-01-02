@@ -8,6 +8,10 @@ module.exports.createTinyUrl = async (data, Responseapi, Helpers, Errorcodes, dy
 
   const randomeUrl = Helpers.makeid(8);
   const tableName = process.env.DYNAMOTABLE;
+
+  const newDate = new Date();
+  const unixTimeToday = parseInt((newDate.getTime() / 1000).toFixed(0));
+
   const item = {
     "tinyurl": {
       S: `${randomeUrl}`
@@ -17,6 +21,9 @@ module.exports.createTinyUrl = async (data, Responseapi, Helpers, Errorcodes, dy
     },
     "original_url":{
       S: `${website}`
+    },
+    "updated_on":{
+      N: `${unixTimeToday}`
     } 
   }
 
@@ -47,6 +54,23 @@ module.exports.getTinyUrl = async (data, Responseapi, Helpers, Errorcodes, dynam
   }
 
   const userData = await dynamoConfig.getItem(tableName, partitionkey, dynamoClient);
+
+  if(userData) {
+    const newDate = new Date();
+    const unixTimeToday = parseInt((newDate.getTime() / 1000).toFixed(0));
+
+    const attributeName ={
+      "#T": "updated_on"
+    }
+    const attributeValue = {
+      ":t": {
+        N: `${unixTimeToday}`
+      }
+    }
+    const expression = "SET #T = :t"
+
+    await dynamoConfig.updateItem(tableName, attributeName, attributeValue, partitionkey,expression, dynamoClient)
+  }
 
   return userData
 

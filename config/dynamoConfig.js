@@ -39,6 +39,28 @@ const Dynamo = {
         }
         
     },
+    async updateItem(table, attributeName, attributeValue, partitionkey,expression, dynamoClient) {
+        try {
+            const params = {
+                ExpressionAttributeNames: attributeName, 
+                ExpressionAttributeValues: attributeValue,
+                Key: partitionkey, 
+                ReturnValues: "ALL_NEW", 
+                TableName: table, 
+                UpdateExpression: expression
+            };
+    
+            const data = await dynamoClient.updateItem(params).promise();
+
+            return data
+            
+        } catch (error) {
+            console.log('fail to update table data::', error);
+            return 'FAILED';
+            
+        }
+        
+    },
 
 };
 

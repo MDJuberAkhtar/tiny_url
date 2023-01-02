@@ -19,8 +19,10 @@ module.exports.handler = async (event) => {
     const data = Helpers.convertStringToJson(event.body);
 
     if(method === 'POST') {
+
       if(!data.website || !data.website.length || !data.email) return Responseapi._Error(errorWithCode('1001'));
       response = await createTinyUrl(data, Responseapi, Helpers, errorWithCode, dynamoClient);
+
     }
 
     if(method === 'GET') {
